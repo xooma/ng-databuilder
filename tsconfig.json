@@ -1,0 +1,31 @@
+{
+  "include": ["src"],
+  "exclude": ["node_modules", "lib"],
+  "compilerOptions": {
+    "declaration": true,
+    "outDir": "lib",
+    "module": "commonjs",
+    "target": "es6",
+    "lib": ["es6"],
+    "alwaysStrict": true,
+    "strictFunctionTypes": true,
+    "strict": true,
+    "emitDecoratorMetadata": true,
+    "strictPropertyInitialization": false,
+    "experimentalDecorators": true,
+    "noImplicitAny": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "removeComments": false,
+    "inlineSourceMap": true,
+    "noEmitHelpers": false,
+    "strictNullChecks": true,
+    "baseUrl": "./",
+    "paths": {
+      "*": ["*"]
+    }
+  },
+  "files": [
+    "src/index.ts"
+  ]
+}
