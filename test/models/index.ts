@@ -1,3 +1,3 @@
-export * from "./without-constructor-params.model";
+export * from "./testing-product.interface";
 export * from "./with-constructor-params.model";
-export * from "./object.interface";
+export * from "./testing-product.interface";

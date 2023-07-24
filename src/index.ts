@@ -1,3 +1,4 @@
-import { makeFactory } from "./factory";
+import { makeFactoryFrom } from "./factory";
+import { IFactory } from "./models/factory.interface";
 
-export { makeFactory }
+export { makeFactoryFrom, IFactory };

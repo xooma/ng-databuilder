@@ -2,12 +2,15 @@
   "include": ["src"],
   "exclude": ["node_modules", "lib"],
   "compilerOptions": {
+    "lib": [
+      "es2018",
+      "dom"
+    ],
     "declaration": true,
     "outDir": "lib",
-    "module": "commonjs",
-    "target": "es6",
-    "lib": ["es6"],
+    "target": "esnext",
     "alwaysStrict": true,
+    "moduleResolution": "node",
     "strictFunctionTypes": true,
     "strict": true,
     "emitDecoratorMetadata": true,
