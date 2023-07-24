@@ -1,44 +1,62 @@
-/* eslint @typescript-eslint/no-explicit-any: 0 */
+import {IFactory} from "./models/factory.interface";
+import {IRandomizerProvider} from "./models/randomizer-provider.interface";
+import {ITypeRandomizer} from "./models/type-randomizer.model";
+import {RandomizerProvider} from "./providers/randomizer.providers";
+import {CustomHttpResponse} from "./features/http-response/custom-http-response";
 
-type Constructor<T> = new (...args: any) => T
+class Factory<T extends object> implements IFactory<T> {
+  private _object: T;
+  private _randomizers: Array<ITypeRandomizer>;
 
-class Factory<T extends object> {
-    private readonly _objectConstructor: Constructor<T>;
-    private _object: T;
-    private _isBuilt = false;
+  constructor(object: T, private _randomizerProvider: IRandomizerProvider) {
+    this._randomizers = this._randomizerProvider.getRandomizers();
+    this._object = {...object};
+  }
 
-    constructor(objectConstructor: Constructor<T>) {
-        this._objectConstructor = objectConstructor;
+  withProperties(properties: Partial<T>): IFactory<T> {
+    this._object = {...this._object, ...properties};
+
+    return this;
+  }
+
+  randomizeParams<K extends keyof T>(param: K | Array<K>): IFactory<T> {
+    const params = Array.isArray(param) ? param : [param];
+
+    for (const key of params) {
+      const currentValue = this._object[key];
+      const targetType = typeof this.randomize(key);
+
+      if (typeof currentValue !== targetType) {
+        throw new Error(`Type mismatch for property '${key.toString()}'. Expected '${targetType}', but got '${typeof currentValue}'.`);
+      }
+
+      this._object = { ...this._object, [key]: this.randomize(key) };
     }
 
-    withProperties(properties: Partial<T>): Factory<T> {
-        this._object = {...this._object, ...properties};
-        this._isBuilt = true;
+    return this;
+  }
 
-        return this;
+  toHttpResponse() {
+    return new CustomHttpResponse<T>();
+  }
+
+  build(): T {
+    return this._object;
+  }
+
+  private randomize<K extends keyof T>(param: K) {
+    const randomizer = this._randomizers.find(r => r.match((this._object[param])));
+
+    if (!randomizer) {
+      throw new Error(`${typeof param} cannot be randomized.`);
     }
 
-    randomizeParams<K extends keyof T>(params: K | Array<K> | 'all', except?: boolean): Factory<T> {
-        if (params === 'all' && typeof except === 'boolean') {
-            throw new Error('Arguments "all" and "except" cannot be used together');
-        }
-        // this._object = { ...this._object, [key]: { ...this._object[key], ...value } };
-
-        return this;
-    }
-
-    build(): T {
-        if (!this._isBuilt) {
-            this._object = new this._objectConstructor();
-            this._isBuilt = true;
-        }
-
-        return this._object;
-    }
+    return randomizer.randomize();
+  }
 }
 
-function makeFactory<T extends object>(objectConstructor: Constructor<T>): Factory<T> {
-    return new Factory<T>(objectConstructor);
+function makeFactoryFrom<T extends object>(object: T): IFactory<T> {
+  return new Factory<T>(object, new RandomizerProvider());
 }
 
-export { makeFactory }
+export {makeFactoryFrom}
