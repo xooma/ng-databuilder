@@ -1,3 +1,5 @@
+import {Observable} from "rxjs";
+
 export interface ITestingProduct {
 	id: string;
 	title: string;
@@ -6,4 +8,5 @@ export interface ITestingProduct {
 	isOk?: boolean;
 	tags?: Array<string>;
 	products?: Array<ITestingProduct>;
+	obs?: Observable<unknown>;
 }

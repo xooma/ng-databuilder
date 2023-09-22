@@ -19,18 +19,36 @@ class Factory<T extends object> implements IFactory<T> {
     return this;
   }
 
-  randomizeParams<K extends keyof T>(param: K | Array<K>): IFactory<T> {
+  randomizeParams<K extends keyof T>(param?: K | Array<K>): IFactory<T> {
+    if (!param) {
+      return this.randomizeAll();
+    }
+
     const params = Array.isArray(param) ? param : [param];
 
     for (const key of params) {
-      const currentValue = this._object[key];
-      const targetType = typeof this.randomize(key);
-
-      if (typeof currentValue !== targetType) {
-        throw new Error(`Type mismatch for property '${key.toString()}'. Expected '${targetType}', but got '${typeof currentValue}'.`);
-      }
+      this.checkTypeMismatch<K>(key);
 
       this._object = { ...this._object, [key]: this.randomize(key) };
+    }
+
+    return this;
+  }
+
+  private checkTypeMismatch<K extends keyof T>(key: K) {
+    const currentValue = this._object[key];
+    const targetType = typeof this.randomize(key);
+
+    if (typeof currentValue !== targetType) {
+      throw new Error(`Type mismatch for property '${key.toString()}'. Expected '${targetType}', but got '${typeof currentValue}'.`);
+    }
+  }
+
+  private randomizeAll() {
+    for (const key in this._object) {
+      if (this._object.hasOwnProperty(key)) {
+        this._object = { ...this._object, [key]: this.randomize(key) };
+      }
     }
 
     return this;
@@ -45,10 +63,14 @@ class Factory<T extends object> implements IFactory<T> {
   }
 
   private randomize<K extends keyof T>(param: K) {
+    if (this._object[param] === undefined) {
+      throw new Error(`Cannot determine type of undefined value.`);
+    }
+
     const randomizer = this._randomizers.find(r => r.match((this._object[param])));
 
     if (!randomizer) {
-      throw new Error(`${typeof param} cannot be randomized.`);
+      throw new Error(`${typeof this._object[param]} cannot be randomized.`);
     }
 
     return randomizer.randomize();

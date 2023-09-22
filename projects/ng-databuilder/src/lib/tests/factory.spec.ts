@@ -2,6 +2,7 @@ import {IFactory, makeFactoryFrom} from "../index";
 import {testingProduct, testingProductWithEmptyArray} from "./factory.spec.data";
 import {HttpHeaders, HttpResponse} from "@angular/common/http";
 import {ITestingProduct} from "./models";
+import {Observable} from "rxjs";
 
 describe('Factory', () => {
   it('build should create object', () => {
@@ -65,6 +66,23 @@ describe('Factory', () => {
       expect(arrayResult.title).not.toEqual(testingProductWithEmptyArray.title);
       expect(arrayResult.amount).not.toEqual(testingProductWithEmptyArray.amount);
       expect(arrayResult.date).not.toEqual(testingProductWithEmptyArray.date);
+    })
+
+    test('Observable', () => {
+      testingFactory = makeFactoryFrom(testingProduct);
+
+      const observableResult = testingFactory.randomizeParams( 'obs').build();
+
+      expect(observableResult.obs).not.toEqual(testingProductWithEmptyArray.obs);
+      expect(observableResult.obs).toBeInstanceOf(Observable);
+    })
+
+    test('"all"', () => {
+      testingFactory = makeFactoryFrom(testingProduct);
+
+      const allResult = testingFactory.randomizeParams().build();
+
+      expect(allResult).not.toEqual(testingProduct);
     })
   })
 

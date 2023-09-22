@@ -4,6 +4,7 @@ import {StringTypeRandomizer} from "./string.type-randomizer";
 import {NumberTypeRandomizer} from "./number.type-randomizer";
 import {BooleanTypeRandomizer} from "./boolean.type-randomizer";
 import {IRandomizerConfiguration} from "../../models/randomizer-configuration.interface";
+import {ObjectTypeRandomizer} from "./object.type-randomizer";
 
 export class ArrayTypeRandomizer extends TypeRandomizerModel<Array<unknown>> {
   private _array: Array<unknown> | undefined;
@@ -14,15 +15,6 @@ export class ArrayTypeRandomizer extends TypeRandomizerModel<Array<unknown>> {
   }
 
   override match(value: unknown): boolean {
-    if (Array.isArray(value) && value.length === 0) {
-      throw new Error('Cannot randomize an empty array.');
-    }
-
-    const isArrayOfUniqueType = (value as Array<unknown>).every((value, _index, array) => typeof value === typeof array[0]);
-
-    if (!isArrayOfUniqueType) {
-      throw new Error('Cannot randomize an array with different element types.');
-    }
 
     if (Array.isArray(value)) {
       this._array = value;
@@ -31,6 +23,7 @@ export class ArrayTypeRandomizer extends TypeRandomizerModel<Array<unknown>> {
         new StringTypeRandomizer(this._config),
         new NumberTypeRandomizer(this._config),
         new BooleanTypeRandomizer(this._config),
+        new ObjectTypeRandomizer(this._config),
         this
       ]
     }
@@ -39,6 +32,16 @@ export class ArrayTypeRandomizer extends TypeRandomizerModel<Array<unknown>> {
   }
 
   randomize(): Array<unknown> {
+    const isArrayOfUniqueType = (this._array as Array<unknown>).every((value, _index, array) => typeof value === typeof array[0]);
+
+    if (!isArrayOfUniqueType) {
+      throw new Error('Cannot randomize an array with different element types.');
+    }
+
+    if (this._array!.length === 0) {
+      throw new Error('Cannot randomize an empty array.');
+    }
+
     const randomizer = this._randomizers!.find(r => r.match(this._array![0]));
 
     if (!randomizer) {
