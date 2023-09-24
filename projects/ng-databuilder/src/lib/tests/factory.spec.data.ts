@@ -1,6 +1,15 @@
 import {ITestingProduct} from "./models";
 import {of} from "rxjs";
 
+export const testingProductThird: ITestingProduct = {
+  id: '2',
+  title: 'test2',
+  date: new Date('2020-01-02T00:00:00.000Z'),
+  amount: 43,
+  isOk: true,
+  tags: ['tag1', 'tag2'],
+}
+
 export const testingProductSecond: ITestingProduct = {
   id: '1',
   title: 'test',
@@ -8,7 +17,7 @@ export const testingProductSecond: ITestingProduct = {
   amount: 42,
   isOk: true,
   tags: ['tag1', 'tag2'],
-  products: [],
+  products: [testingProductThird, testingProductThird],
 }
 
 export const testingProduct: ITestingProduct = {

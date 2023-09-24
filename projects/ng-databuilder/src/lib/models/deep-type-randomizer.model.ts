@@ -1,7 +1,7 @@
 import {IRandomizerConfiguration} from "./randomizer-configuration.interface";
 import {ITypeRandomizer} from "./type-randomizer.interface";
 
-export abstract class TypeRandomizerModel<T> implements ITypeRandomizer {
+export abstract class DeepTypeRandomizerModel<T> implements ITypeRandomizer {
   _type!: string | (new () => T);
   readonly _config: IRandomizerConfiguration;
 
@@ -9,7 +9,7 @@ export abstract class TypeRandomizerModel<T> implements ITypeRandomizer {
     this._config = config;
   }
 
-  abstract randomize(): T;
+  abstract randomize(object: unknown): T;
   match(type: unknown): boolean {
     return typeof type === this._type;
   }

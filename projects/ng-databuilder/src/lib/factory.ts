@@ -1,8 +1,8 @@
 import {IFactory} from "./models/factory.interface";
 import {IRandomizerProvider} from "./models/randomizer-provider.interface";
-import {ITypeRandomizer} from "./models/type-randomizer.model";
 import {RandomizerProvider} from "./providers/randomizer.providers";
 import {CustomHttpResponse} from "./features/http-response/custom-http-response";
+import {ITypeRandomizer} from "./models/type-randomizer.interface";
 
 class Factory<T extends object> implements IFactory<T> {
   private _object: T;
@@ -73,7 +73,7 @@ class Factory<T extends object> implements IFactory<T> {
       throw new Error(`${typeof this._object[param]} cannot be randomized.`);
     }
 
-    return randomizer.randomize();
+    return randomizer.randomize(this._object[param]);
   }
 }
 

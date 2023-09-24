@@ -5,10 +5,12 @@ import {NumberTypeRandomizer} from "./number.type-randomizer";
 import {BooleanTypeRandomizer} from "./boolean.type-randomizer";
 import {IRandomizerConfiguration} from "../../models/randomizer-configuration.interface";
 import {ObjectTypeRandomizer} from "./object.type-randomizer";
+import {ObservableTypeRandomizer} from "./observable.type-randomizer";
+import {ITypeRandomizer} from "../../models/type-randomizer.interface";
 
 export class ArrayTypeRandomizer extends TypeRandomizerModel<Array<unknown>> {
   private _array: Array<unknown> | undefined;
-  private _randomizers: Array<TypeRandomizerModel<unknown>> | undefined;
+  private _randomizers!: Array<ITypeRandomizer>;
 
   constructor(config: IRandomizerConfiguration) {
     super(config);
@@ -23,6 +25,7 @@ export class ArrayTypeRandomizer extends TypeRandomizerModel<Array<unknown>> {
         new StringTypeRandomizer(this._config),
         new NumberTypeRandomizer(this._config),
         new BooleanTypeRandomizer(this._config),
+        new ObservableTypeRandomizer(this._config),
         new ObjectTypeRandomizer(this._config),
         this
       ]
@@ -42,12 +45,12 @@ export class ArrayTypeRandomizer extends TypeRandomizerModel<Array<unknown>> {
       throw new Error('Cannot randomize an empty array.');
     }
 
-    const randomizer = this._randomizers!.find(r => r.match(this._array![0]));
+    const randomizer = this._randomizers.find(r => r.match(this._array![0]));
 
     if (!randomizer) {
       throw new Error(`${typeof this._array![0]} cannot be randomized.`);
     }
 
-    return [randomizer.randomize()];
+    return [randomizer.randomize(this._array![0])];
   }
 }
